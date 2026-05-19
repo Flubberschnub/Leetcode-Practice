@@ -4,6 +4,12 @@ A local-first React app for planning LeetCode practice around algorithm patterns
 
 The planner gives you a small lesson when you are ready to practice. A lesson contains new problems from the current pattern track plus review problems that are due based on previous solve results. After each problem, log whether you solved it solo, used a hint, or needed the solution.
 
+## Screenshots
+
+![Lesson terminal view](Screenshots/Screenshot%202026-05-19%20183401.png)
+
+![Pattern map and planner controls](Screenshots/Screenshot%202026-05-19%20183459.png)
+
 ## Features
 
 - Lesson-based planning instead of calendar-based planning
