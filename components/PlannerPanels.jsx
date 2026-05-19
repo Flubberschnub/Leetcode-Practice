@@ -6,17 +6,34 @@ import { DailyProblemCard } from "./DailyProblemCard";
 import { NumberSetting } from "./NumberSetting";
 import { ActionButton, EmptyState, Panel, StatusPill } from "./ui";
 
-export function TodayPanel({ dailyItems, lockTodayPlan, markResult, state, today }) {
+export function TodayPanel({ activeLesson, dailyItems, isLessonComplete, markResult, startLesson, state }) {
+  if (!activeLesson) {
+    return (
+      <Panel>
+        <div className="terminal-card p-8">
+          <p className="terminal-label">lesson process</p>
+          <h2 className="terminal-title mt-2 text-3xl">no_active_lesson</h2>
+          <p className="theme-muted mt-3 max-w-2xl text-sm">
+            Start a lesson when you are ready to practice. Reviews are scheduled by future lesson count, not calendar dates.
+          </p>
+          <div className="mt-5">
+            <ActionButton onClick={startLesson}>Start lesson</ActionButton>
+          </div>
+        </div>
+      </Panel>
+    );
+  }
+
   return (
     <Panel>
       <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="terminal-title text-2xl">./daily_lesson --date {today}</h2>
+          <h2 className="terminal-title text-2xl">./lesson --id {activeLesson.id}</h2>
           <p className="theme-muted mt-1">
             Target mix: {state.config.newPerDay} new problem{state.config.newPerDay === 1 ? "" : "s"} and {state.config.reviewPerDay} review{state.config.reviewPerDay === 1 ? "" : "s"}.
           </p>
         </div>
-        <ActionButton onClick={lockTodayPlan} variant="secondary">Lock today's plan</ActionButton>
+        {isLessonComplete ? <ActionButton onClick={startLesson} variant="secondary">Start next lesson</ActionButton> : null}
       </div>
 
       <div className="space-y-4">
@@ -30,7 +47,7 @@ export function TodayPanel({ dailyItems, lockTodayPlan, markResult, state, today
   );
 }
 
-export function BacklogPanel({ reviewBacklog, today }) {
+export function BacklogPanel({ lessonNumber, reviewBacklog }) {
   return (
     <Panel>
       <div className="mb-5">
@@ -42,7 +59,7 @@ export function BacklogPanel({ reviewBacklog, today }) {
         {reviewBacklog.length > 0 ? reviewBacklog.map((problem) => {
           const lastAttempt = getLastAttempt(problem);
           const lastLabel = lastAttempt ? RESULT_SETTINGS[lastAttempt.result].label : "No attempts yet";
-          const isDue = problem.dueDate && problem.dueDate <= today;
+          const isDue = problem.dueLesson && problem.dueLesson <= lessonNumber;
 
           return (
             <article key={problem.id} className="terminal-card grid gap-0 md:grid-cols-[90px_1fr_180px]">
@@ -57,7 +74,7 @@ export function BacklogPanel({ reviewBacklog, today }) {
                 </div>
                 <a href={problem.url} target="_blank" rel="noreferrer" className="terminal-prompt theme-link block px-4 pt-2 font-bold underline-offset-4 hover:underline">{problem.title}</a>
                 <p className="theme-muted px-4 pb-4 pt-2 text-sm">
-                  Due: {problem.dueDate || "not scheduled"} - Attempts: {problem.attempts.length} - Mastery: {problem.mastery}/10
+                  Due lesson: {problem.dueLesson || "not scheduled"} - Attempts: {problem.attempts.length} - Mastery: {problem.mastery}/10
                 </p>
               </div>
               <div className="border-t p-4 md:border-l md:border-t-0" style={{ borderColor: "var(--color-border)" }}>
@@ -110,7 +127,7 @@ export function LibraryPanel({ libraryProblems, patternFilter, search, setPatter
                 <StatusPill tone={difficultyTone(problem.difficulty)}>{problem.difficulty}</StatusPill>
               </div>
               <a href={problem.url} target="_blank" rel="noreferrer" className="terminal-prompt theme-link mt-2 block font-bold underline-offset-4 hover:underline">{problem.title}</a>
-              <p className="theme-muted mt-2 text-sm">Status: {problem.status} - Next review: {problem.dueDate || "not started"}</p>
+              <p className="theme-muted mt-2 text-sm">Status: {problem.status} - Review lesson: {problem.dueLesson || "not started"}</p>
             </div>
             <div className="border-t p-4 md:border-l md:border-t-0" style={{ borderColor: "var(--color-border)" }}>
               <p className="terminal-label">tries</p>

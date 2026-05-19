@@ -1,4 +1,3 @@
-import { addDays } from "../utils/date";
 import { DEFAULT_CONFIG, PATTERN_ORDER, RESULT_SETTINGS } from "./constants";
 
 export function getLastAttempt(problem) {
@@ -9,6 +8,11 @@ export function getLastAttempt(problem) {
 export function getAttemptForDate(problem, date) {
   if (!problem.attempts || problem.attempts.length === 0) return null;
   return [...problem.attempts].reverse().find((attempt) => attempt.date === date) || null;
+}
+
+export function getAttemptForLesson(problem, lessonId) {
+  if (!problem.attempts || problem.attempts.length === 0) return null;
+  return [...problem.attempts].reverse().find((attempt) => attempt.lessonId === lessonId) || null;
 }
 
 export function difficultyRank(difficulty) {
@@ -28,19 +32,18 @@ function patternRank(pattern) {
   return index === -1 ? PATTERN_ORDER.length : index;
 }
 
-export function reviewPriority(problem, today) {
-  if (!problem.dueDate) return -999999;
+export function reviewPriority(problem, lessonNumber) {
+  if (!problem.dueLesson) return -999999;
 
-  const dueTime = new Date(problem.dueDate + "T12:00:00").getTime();
-  const todayTime = new Date(today + "T12:00:00").getTime();
-  const overdueDays = Math.max(0, Math.floor((todayTime - dueTime) / 86400000));
+  const overdueDays = Math.max(0, lessonNumber - problem.dueLesson);
   const weaknessBoost = Math.max(0, 5 - problem.mastery);
   return overdueDays * 10 + weaknessBoost + problem.attempts.length;
 }
 
-export function generatePlan(state, today) {
-  if (state.dailyPlans[today]) {
-    return state.dailyPlans[today];
+export function generatePlan(state, lessonNumber) {
+  const existingLesson = state.lessons?.[lessonNumber];
+  if (existingLesson?.plan) {
+    return existingLesson.plan;
   }
 
   const config = state.config || DEFAULT_CONFIG;
@@ -50,8 +53,8 @@ export function generatePlan(state, today) {
   const currentPattern = PATTERN_ORDER[config.currentPatternIndex] || PATTERN_ORDER[0];
 
   const allDueReviews = state.problems
-    .filter((problem) => problem.status !== "unseen" && problem.dueDate && problem.dueDate <= today)
-    .sort((a, b) => reviewPriority(b, today) - reviewPriority(a, today));
+    .filter((problem) => problem.status !== "unseen" && problem.dueLesson && problem.dueLesson <= lessonNumber)
+    .sort((a, b) => reviewPriority(b, lessonNumber) - reviewPriority(a, lessonNumber));
 
   const dueReviews = allDueReviews.slice(0, reviewTarget);
   const availableNewSlots = Math.max(0, dailyCount - dueReviews.length);
@@ -100,7 +103,7 @@ export function generatePlan(state, today) {
     }));
 }
 
-export function getNextReviewUpdate(problem, result, today) {
+export function getNextReviewUpdate(problem, result, lessonNumber) {
   const settings = RESULT_SETTINGS[result];
   const stage = Math.max(0, Math.min(problem.reviewStage || 0, settings.intervals.length - 1));
   const intervalIndex = result === "solution" ? 0 : stage;
@@ -109,14 +112,15 @@ export function getNextReviewUpdate(problem, result, today) {
 
   return {
     reviewStage: nextStage,
-    dueDate: addDays(today, interval),
+    dueLesson: lessonNumber + interval,
+    dueDate: null,
     mastery: Math.max(0, Math.min(10, (problem.mastery || 0) + settings.masteryGain)),
   };
 }
 
-export function calculateStats(problems, today) {
+export function calculateStats(problems, lessonNumber) {
   const started = problems.filter((problem) => problem.status !== "unseen").length;
-  const due = problems.filter((problem) => problem.status !== "unseen" && problem.dueDate && problem.dueDate <= today).length;
+  const due = problems.filter((problem) => problem.status !== "unseen" && problem.dueLesson && problem.dueLesson <= lessonNumber).length;
   const mastered = problems.filter((problem) => problem.mastery >= 6).length;
 
   return { started, due, mastered };

@@ -7,7 +7,7 @@ import { NEETCODE_150_URL, PATTERN_ORDER } from "./planner/constants";
 import {
   calculateStats,
   generatePlan,
-  getAttemptForDate,
+  getAttemptForLesson,
   getLastAttempt,
   getNextReviewUpdate,
   reviewPriority,
@@ -24,30 +24,33 @@ export default function LeetCodeReviewPlanner() {
   const [patternFilter, setPatternFilter] = useState("all");
 
   const today = getToday();
+  const activeLesson = state.activeLessonId ? state.lessons?.[state.activeLessonId] : null;
+  const planningLessonNumber = activeLesson?.id || (state.lessonCounter || 0) + 1;
 
   useEffect(() => {
     saveState(state);
   }, [state]);
 
-  const plan = useMemo(() => generatePlan(state, today), [state, today]);
-  const dailyItems = plan
+  const dailyItems = (activeLesson?.plan || [])
     .map((entry) => {
       const problem = state.problems.find((candidate) => candidate.id === entry.problemId);
       return {
         ...entry,
         problem,
-        attemptToday: problem ? getAttemptForDate(problem, today) : null,
+        attemptThisLesson: problem && activeLesson ? getAttemptForLesson(problem, activeLesson.id) : null,
       };
     })
     .filter((entry) => entry.problem);
+  const isLessonComplete = Boolean(activeLesson && dailyItems.length > 0 && dailyItems.every((item) => item.attemptThisLesson));
+  const reviewHorizonLesson = isLessonComplete ? activeLesson.id + 1 : planningLessonNumber;
 
-  const stats = calculateStats(state.problems, today);
+  const stats = calculateStats(state.problems, reviewHorizonLesson);
   const currentPattern = PATTERN_ORDER[state.config.currentPatternIndex] || PATTERN_ORDER[0];
   const themeStyle = useMemo(() => getThemeStyle(state.config), [state.config]);
 
   const reviewBacklog = [...state.problems]
     .filter((problem) => problem.status !== "unseen")
-    .sort((a, b) => reviewPriority(b, today) - reviewPriority(a, today));
+    .sort((a, b) => reviewPriority(b, reviewHorizonLesson) - reviewPriority(a, reviewHorizonLesson));
 
   const libraryProblems = state.problems.filter((problem) => {
     const matchesSearch = problem.title.toLowerCase().includes(search.toLowerCase());
@@ -55,14 +58,22 @@ export default function LeetCodeReviewPlanner() {
     return matchesSearch && matchesPattern;
   });
 
-  function lockTodayPlan() {
+  function startLesson() {
     setState((previous) => {
-      if (previous.dailyPlans[today]) return previous;
+      const nextLessonId = (previous.lessonCounter || 0) + 1;
+      const plan = generatePlan(previous, nextLessonId);
+
       return {
         ...previous,
-        dailyPlans: {
-          ...previous.dailyPlans,
-          [today]: plan,
+        activeLessonId: nextLessonId,
+        lessonCounter: nextLessonId,
+        lessons: {
+          ...previous.lessons,
+          [nextLessonId]: {
+            id: nextLessonId,
+            startedAt: new Date().toISOString(),
+            plan,
+          },
         },
       };
     });
@@ -70,39 +81,34 @@ export default function LeetCodeReviewPlanner() {
 
   function markResult(problemId, result) {
     setState((previous) => {
-      const existingPlan = previous.dailyPlans[today] || plan;
+      const lessonId = previous.activeLessonId;
+      if (!lessonId) return previous;
+
       return {
         ...previous,
-        dailyPlans: {
-          ...previous.dailyPlans,
-          [today]: existingPlan,
-        },
         problems: previous.problems.map((problem) => {
           if (problem.id !== problemId) return problem;
 
           const lastAttempt = getLastAttempt(problem);
-          const replacingToday = lastAttempt && lastAttempt.date === today;
-          const baseProblem = replacingToday
-            ? {
-                ...problem,
-                reviewStage: Number.isFinite(lastAttempt.previousReviewStage) ? lastAttempt.previousReviewStage : Math.max(0, (problem.reviewStage || 0) - 1),
-                mastery: Number.isFinite(lastAttempt.previousMastery) ? lastAttempt.previousMastery : problem.mastery || 0,
-              }
-            : problem;
-          const next = getNextReviewUpdate(baseProblem, result, today);
+          if (lastAttempt && lastAttempt.lessonId === lessonId) return problem;
+
+          const next = getNextReviewUpdate(problem, result, lessonId);
           const nextAttempt = {
             date: today,
+            lessonId,
             result,
-            previousReviewStage: baseProblem.reviewStage || 0,
-            previousMastery: baseProblem.mastery || 0,
+            previousReviewStage: problem.reviewStage || 0,
+            previousMastery: problem.mastery || 0,
           };
 
           return {
             ...problem,
             status: "reviewing",
-            attempts: replacingToday ? [...problem.attempts.slice(0, -1), nextAttempt] : [...problem.attempts, nextAttempt],
+            attempts: [...problem.attempts, nextAttempt],
             lastAttemptDate: today,
+            lastAttemptLesson: lessonId,
             reviewStage: next.reviewStage,
+            dueLesson: next.dueLesson,
             dueDate: next.dueDate,
             mastery: next.mastery,
           };
@@ -175,14 +181,14 @@ export default function LeetCodeReviewPlanner() {
             <div className="max-w-4xl">
               <div className="flex flex-wrap items-center gap-2">
                 <StatusPill tone="blue">LC_REVIEW_OS</StatusPill>
-                <span className="terminal-code px-3 py-1 text-xs">session={today}</span>
+                <span className="terminal-code px-3 py-1 text-xs">next_lesson={planningLessonNumber}</span>
               </div>
               <h1 className="terminal-title mt-4 text-4xl md:text-6xl">
                 Wake up, practice patterns.
               </h1>
               <p className="theme-muted mt-4 max-w-3xl text-sm leading-7">
                 <span className="terminal-prompt">boot lesson planner</span><br />
-                ingest NeetCode 150, schedule recall probes, write result states, repeat until pattern recognition compiles.
+                lessons start only when you start them; review probes are scheduled by future lesson count, not calendar time.
               </p>
               <a href={NEETCODE_150_URL} target="_blank" rel="noreferrer" className="theme-link mt-3 inline-block text-sm font-medium underline-offset-4 hover:underline">
                 source://neetcode150
@@ -197,7 +203,7 @@ export default function LeetCodeReviewPlanner() {
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <StatCard label="Current pattern" value={currentPattern} helper="New problems come from this lesson track." />
           <StatCard label="Problems started" value={stats.started + "/" + state.problems.length} helper="Started means attempted at least once." />
-          <StatCard label="Due for review" value={String(stats.due)} helper="Overdue reviews rise to the top." />
+          <StatCard label="Due next lesson" value={String(stats.due)} helper="Reviews are keyed to lesson count." />
           <StatCard label="Mastery 6+" value={String(stats.mastered)} helper="A rough signal of durable recall." />
         </section>
 
@@ -205,7 +211,7 @@ export default function LeetCodeReviewPlanner() {
 
         <nav className="terminal-panel flex flex-wrap gap-2 p-2">
           {[
-            ["today", "Today's plan"],
+            ["today", "Lesson"],
             ["backlog", "Review backlog"],
             ["library", "Problem library"],
             ["settings", "Settings"],
@@ -226,15 +232,16 @@ export default function LeetCodeReviewPlanner() {
 
         {activeTab === "today" ? (
           <TodayPanel
+            activeLesson={activeLesson}
             dailyItems={dailyItems}
-            lockTodayPlan={lockTodayPlan}
+            isLessonComplete={isLessonComplete}
             markResult={markResult}
+            startLesson={startLesson}
             state={state}
-            today={today}
           />
         ) : null}
 
-        {activeTab === "backlog" ? <BacklogPanel reviewBacklog={reviewBacklog} today={today} /> : null}
+        {activeTab === "backlog" ? <BacklogPanel lessonNumber={reviewHorizonLesson} reviewBacklog={reviewBacklog} /> : null}
 
         {activeTab === "library" ? (
           <LibraryPanel

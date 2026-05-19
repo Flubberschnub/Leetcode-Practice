@@ -16,7 +16,9 @@ export function cloneProblemLibrary() {
     attempts: [],
     reviewStage: 0,
     mastery: 0,
+    dueLesson: null,
     dueDate: null,
+    lastAttemptLesson: null,
     lastAttemptDate: null,
   }));
 }
@@ -38,22 +40,32 @@ function mergeProblemsWithLibrary(savedProblems = []) {
       attempts: Array.isArray(saved.attempts) ? saved.attempts : [],
       reviewStage: Number.isFinite(saved.reviewStage) ? saved.reviewStage : 0,
       mastery: Number.isFinite(saved.mastery) ? saved.mastery : 0,
+      dueLesson: Number.isFinite(saved.dueLesson) ? saved.dueLesson : saved.dueDate ? 1 : null,
       dueDate: saved.dueDate || null,
+      lastAttemptLesson: Number.isFinite(saved.lastAttemptLesson) ? saved.lastAttemptLesson : null,
       lastAttemptDate: saved.lastAttemptDate || null,
     };
   });
 }
 
-function normalizeDailyPlans(dailyPlans = {}) {
+function normalizePlanEntries(entries = []) {
+  return Array.isArray(entries)
+    ? entries.map((entry) => ({
+        ...entry,
+        problemId: normalizeProblemId(entry.problemId),
+      }))
+    : [];
+}
+
+function normalizeLessons(lessons = {}) {
   return Object.fromEntries(
-    Object.entries(dailyPlans).map(([date, entries]) => [
-      date,
-      Array.isArray(entries)
-        ? entries.map((entry) => ({
-            ...entry,
-            problemId: normalizeProblemId(entry.problemId),
-          }))
-        : [],
+    Object.entries(lessons).map(([lessonId, lesson]) => [
+      lessonId,
+      {
+        ...lesson,
+        id: Number(lesson.id || lessonId),
+        plan: normalizePlanEntries(lesson.plan),
+      },
     ])
   );
 }
@@ -66,7 +78,10 @@ function normalizeSavedState(savedState) {
   return {
     config: { ...DEFAULT_CONFIG, ...savedState.config },
     problems: mergeProblemsWithLibrary(savedState.problems),
-    dailyPlans: normalizeDailyPlans(savedState.dailyPlans),
+    lessons: normalizeLessons(savedState.lessons),
+    activeLessonId: Number.isFinite(savedState.activeLessonId) ? savedState.activeLessonId : null,
+    lessonCounter: Number.isFinite(savedState.lessonCounter) ? savedState.lessonCounter : 0,
+    dailyPlans: {},
   };
 }
 
@@ -74,6 +89,9 @@ export function createInitialState() {
   return {
     config: { ...DEFAULT_CONFIG },
     problems: cloneProblemLibrary(),
+    lessons: {},
+    activeLessonId: null,
+    lessonCounter: 0,
     dailyPlans: {},
   };
 }

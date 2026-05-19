@@ -20,7 +20,7 @@ export function Panel({ children, className = "" }) {
   return <section className={"terminal-panel p-5 " + className}>{children}</section>;
 }
 
-export function ActionButton({ children, onClick, variant = "primary" }) {
+export function ActionButton({ children, disabled = false, onClick, variant = "primary" }) {
   const variants = {
     primary: "theme-button-primary",
     secondary: "theme-button-secondary",
@@ -30,8 +30,9 @@ export function ActionButton({ children, onClick, variant = "primary" }) {
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={onClick}
-      className={"px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition " + variants[variant]}
+      className={"px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition disabled:cursor-not-allowed disabled:opacity-40 " + variants[variant]}
     >
       {children}
     </button>
