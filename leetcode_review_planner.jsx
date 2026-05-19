@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { BacklogPanel, LibraryPanel, SettingsPanel, TodayPanel } from "./components/PlannerPanels";
 import { PatternSignalMap } from "./components/PatternSignalMap";
 import { StatCard } from "./components/StatCard";
-import { ActionButton, StatusPill } from "./components/ui";
+import { StatusPill } from "./components/ui";
 import { NEETCODE_150_URL, PATTERN_ORDER } from "./planner/constants";
 import {
   calculateStats,
@@ -188,13 +188,12 @@ export default function LeetCodeReviewPlanner() {
               </h1>
               <p className="theme-muted mt-4 max-w-3xl text-sm leading-7">
                 <span className="terminal-prompt">boot lesson planner</span><br />
-                lessons start only when you start them; review probes are scheduled by future lesson count, not calendar time.
+                initialize solution vectors. trace computational recall durability. target long-term retention sectors. replicate active recall cycles and continuously refresh pattern recognition subroutines.
               </p>
               <a href={NEETCODE_150_URL} target="_blank" rel="noreferrer" className="theme-link mt-3 inline-block text-sm font-medium underline-offset-4 hover:underline">
                 source://neetcode150
               </a>
             </div>
-            <ActionButton onClick={resetPlanner} variant="outline">Reset progress</ActionButton>
           </div>
           <div className="terminal-divider mt-6" />
           <p className="matrix-glyphs mt-4 text-xs">00101100 11001010 01010111 10001100 01110010 00011101 11010001 01100110 10101010</p>
@@ -260,6 +259,7 @@ export default function LeetCodeReviewPlanner() {
             exportProgressFile={exportProgressFile}
             fileStatus={fileStatus}
             importProgressFile={importProgressFile}
+            resetPlanner={resetPlanner}
             state={state}
             updateConfig={updateConfig}
           />

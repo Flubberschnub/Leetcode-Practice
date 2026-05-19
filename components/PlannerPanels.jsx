@@ -140,7 +140,14 @@ export function LibraryPanel({ libraryProblems, patternFilter, search, setPatter
   );
 }
 
-export function SettingsPanel({ advancePattern, currentPattern, exportProgressFile, fileStatus, importProgressFile, state, updateConfig }) {
+export function SettingsPanel({ advancePattern, currentPattern, exportProgressFile, fileStatus, importProgressFile, resetPlanner, state, updateConfig }) {
+  function confirmReset() {
+    const confirmed = window.confirm("Reset all planner progress? This clears lessons, attempts, review scheduling, and local saved progress.");
+    if (confirmed) {
+      resetPlanner();
+    }
+  }
+
   return (
     <Panel>
       <div className="mb-5">
@@ -225,6 +232,16 @@ export function SettingsPanel({ advancePattern, currentPattern, exportProgressFi
               <input type="file" accept="application/json,.json" onChange={importProgressFile} className="hidden" />
             </label>
           </div>
+        </div>
+      </div>
+
+      <div className="terminal-card mt-5 p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="terminal-label">danger_zone</p>
+            <p className="theme-muted mt-1 text-sm">Clear all local lessons, attempts, review stages, and saved planner state.</p>
+          </div>
+          <ActionButton onClick={confirmReset} variant="outline">Reset progress</ActionButton>
         </div>
       </div>
     </Panel>
