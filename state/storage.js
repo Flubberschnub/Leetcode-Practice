@@ -58,6 +58,18 @@ function normalizeDailyPlans(dailyPlans = {}) {
   );
 }
 
+function normalizeSavedState(savedState) {
+  if (!savedState || !Array.isArray(savedState.problems) || !savedState.config) {
+    return null;
+  }
+
+  return {
+    config: { ...DEFAULT_CONFIG, ...savedState.config },
+    problems: mergeProblemsWithLibrary(savedState.problems),
+    dailyPlans: normalizeDailyPlans(savedState.dailyPlans),
+  };
+}
+
 export function createInitialState() {
   return {
     config: { ...DEFAULT_CONFIG },
@@ -73,16 +85,7 @@ export function loadState() {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return createInitialState();
     const parsed = JSON.parse(raw);
-
-    if (!parsed || !Array.isArray(parsed.problems) || !parsed.config) {
-      return createInitialState();
-    }
-
-    return {
-      config: { ...DEFAULT_CONFIG, ...parsed.config },
-      problems: mergeProblemsWithLibrary(parsed.problems),
-      dailyPlans: normalizeDailyPlans(parsed.dailyPlans),
-    };
+    return normalizeSavedState(parsed) || createInitialState();
   } catch (error) {
     return createInitialState();
   }
@@ -97,4 +100,29 @@ export function resetSavedState() {
   if (typeof window !== "undefined") {
     window.localStorage.removeItem(STORAGE_KEY);
   }
+}
+
+export function serializeStateFile(state) {
+  return JSON.stringify(
+    {
+      app: "leetcode-review-planner",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      state,
+    },
+    null,
+    2
+  );
+}
+
+export function parseStateFile(fileText) {
+  const parsed = JSON.parse(fileText);
+  const savedState = parsed && parsed.state ? parsed.state : parsed;
+  const normalized = normalizeSavedState(savedState);
+
+  if (!normalized) {
+    throw new Error("The selected file is not a valid planner progress file.");
+  }
+
+  return normalized;
 }

@@ -11,12 +11,13 @@ import {
   getNextReviewUpdate,
   reviewPriority,
 } from "./planner/scheduler";
-import { createInitialState, loadState, resetSavedState, saveState } from "./state/storage";
+import { createInitialState, loadState, parseStateFile, resetSavedState, saveState, serializeStateFile } from "./state/storage";
 import { getToday } from "./utils/date";
 
 export default function LeetCodeReviewPlanner() {
   const [state, setState] = useState(() => loadState());
   const [activeTab, setActiveTab] = useState("today");
+  const [fileStatus, setFileStatus] = useState("");
   const [search, setSearch] = useState("");
   const [patternFilter, setPatternFilter] = useState("all");
 
@@ -129,7 +130,38 @@ export default function LeetCodeReviewPlanner() {
 
   function resetPlanner() {
     resetSavedState();
+    setFileStatus("");
     setState(createInitialState());
+  }
+
+  function exportProgressFile() {
+    const blob = new Blob([serializeStateFile(state)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "leetcode-review-planner-" + today + ".json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setFileStatus("Exported progress file for " + today + ".");
+  }
+
+  async function importProgressFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const fileText = await file.text();
+      const importedState = parseStateFile(fileText);
+      setState(importedState);
+      setFileStatus("Imported " + file.name + ".");
+    } catch (error) {
+      setFileStatus(error instanceof Error ? error.message : "Could not import that progress file.");
+    } finally {
+      event.target.value = "";
+    }
   }
 
   return (
@@ -207,6 +239,9 @@ export default function LeetCodeReviewPlanner() {
           <SettingsPanel
             advancePattern={advancePattern}
             currentPattern={currentPattern}
+            exportProgressFile={exportProgressFile}
+            fileStatus={fileStatus}
+            importProgressFile={importProgressFile}
             state={state}
             updateConfig={updateConfig}
           />

@@ -108,7 +108,7 @@ export function LibraryPanel({ libraryProblems, patternFilter, search, setPatter
   );
 }
 
-export function SettingsPanel({ advancePattern, currentPattern, state, updateConfig }) {
+export function SettingsPanel({ advancePattern, currentPattern, exportProgressFile, fileStatus, importProgressFile, state, updateConfig }) {
   return (
     <Panel>
       <div className="mb-5">
@@ -129,6 +129,23 @@ export function SettingsPanel({ advancePattern, currentPattern, state, updateCon
             <p className="mt-1 text-sm text-slate-600">{currentPattern}</p>
           </div>
           <ActionButton onClick={advancePattern}>Advance to next pattern</ActionButton>
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="font-semibold">Progress file</p>
+            <p className="mt-1 text-sm text-slate-600">Export a JSON backup or import one from another browser or machine.</p>
+            {fileStatus ? <p className="mt-2 text-sm text-slate-500">{fileStatus}</p> : null}
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <ActionButton onClick={exportProgressFile} variant="secondary">Export JSON</ActionButton>
+            <label className="cursor-pointer rounded-2xl border border-slate-300 bg-white px-4 py-2 text-center text-sm font-medium text-slate-900 transition hover:bg-slate-50">
+              Import JSON
+              <input type="file" accept="application/json,.json" onChange={importProgressFile} className="hidden" />
+            </label>
+          </div>
         </div>
       </div>
     </Panel>
