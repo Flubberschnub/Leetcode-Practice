@@ -3,9 +3,10 @@ import { PATTERN_CODES, RESULT_SETTINGS } from "../planner/constants";
 import { difficultyTone } from "../planner/scheduler";
 import { ActionButton, StatusPill } from "./ui";
 
-export function DailyProblemCard({ item, onMark }) {
+export function DailyProblemCard({ item, onMark, onSkip }) {
   const problem = item.problem;
   const attemptThisLesson = item.attemptThisLesson;
+  const isSkipped = Boolean(item.skipped);
   const reviewCopy = item.kind === "review"
     ? "Rebuild the approach from memory before looking at notes."
     : "New problem from the current pattern track.";
@@ -13,9 +14,10 @@ export function DailyProblemCard({ item, onMark }) {
   const patternCode = PATTERN_CODES[problem.pattern] || "ALG";
   const memoryAddress = "0x" + (problem.id.length * 4099 + (problem.order || 0) * 257).toString(16).toUpperCase();
   const isLogged = Boolean(attemptThisLesson);
+  const isInactive = isLogged || isSkipped;
 
   return (
-    <article className={"terminal-card transition " + (isLogged ? "opacity-45 grayscale" : "")}>
+    <article className={"terminal-card transition " + (isInactive ? "opacity-45 grayscale" : "")}>
       <div className="grid gap-0 lg:grid-cols-[150px_1fr_230px]">
         <div className="border-b p-4 lg:border-b-0 lg:border-r" style={{ borderColor: "var(--color-border)" }}>
           <p className="terminal-label">module</p>
@@ -30,6 +32,7 @@ export function DailyProblemCard({ item, onMark }) {
             <StatusPill>{problem.pattern}</StatusPill>
             <StatusPill tone={difficultyTone(problem.difficulty)}>{problem.difficulty}</StatusPill>
             {isLogged ? <StatusPill tone={resultTone}>logged</StatusPill> : null}
+            {isSkipped ? <StatusPill tone="neutral">skipped</StatusPill> : null}
           </div>
           <a
             href={problem.url}
@@ -40,10 +43,10 @@ export function DailyProblemCard({ item, onMark }) {
             solve("{problem.title}")
           </a>
           <p className="theme-muted mt-3 text-sm">
-            {attemptThisLesson ? "Lesson result: " + RESULT_SETTINGS[attemptThisLesson.result].label + ". Review lesson: " + (problem.dueLesson || "not scheduled") + "." : reviewCopy}
+            {isSkipped ? "Skipped for this lesson. Problem history and review schedule were not changed." : attemptThisLesson ? "Lesson result: " + RESULT_SETTINGS[attemptThisLesson.result].label + ". Review lesson: " + (problem.dueLesson || "not scheduled") + "." : reviewCopy}
           </p>
-          {isLogged ? (
-            <p className="terminal-code mt-4 inline-block px-3 py-2 text-xs">status=complete write_locked=true</p>
+          {isInactive ? (
+            <p className="terminal-code mt-4 inline-block px-3 py-2 text-xs">status={isSkipped ? "skipped" : "complete"} write_locked=true</p>
           ) : null}
           {item.kind === "review" && problem.dueLesson ? (
             <p className="terminal-code mt-4 inline-block px-3 py-2 text-xs">due_lesson={problem.dueLesson}</p>
@@ -52,9 +55,10 @@ export function DailyProblemCard({ item, onMark }) {
 
         <div className="flex flex-col gap-2 p-4">
           <p className="terminal-label">write_result</p>
-          <ActionButton disabled={isLogged} onClick={() => onMark(problem.id, "independent")}>solo</ActionButton>
-          <ActionButton disabled={isLogged} onClick={() => onMark(problem.id, "hint")} variant="secondary">hint</ActionButton>
-          <ActionButton disabled={isLogged} onClick={() => onMark(problem.id, "solution")} variant="outline">solution</ActionButton>
+          <ActionButton disabled={isInactive} onClick={() => onMark(problem.id, "independent")}>solo</ActionButton>
+          <ActionButton disabled={isInactive} onClick={() => onMark(problem.id, "hint")} variant="secondary">hint</ActionButton>
+          <ActionButton disabled={isInactive} onClick={() => onMark(problem.id, "solution")} variant="outline">solution</ActionButton>
+          <ActionButton disabled={isInactive} onClick={() => onSkip(problem.id)} variant="outline">skip</ActionButton>
         </div>
       </div>
     </article>

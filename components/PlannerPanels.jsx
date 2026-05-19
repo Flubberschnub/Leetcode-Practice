@@ -6,7 +6,7 @@ import { DailyProblemCard } from "./DailyProblemCard";
 import { NumberSetting } from "./NumberSetting";
 import { ActionButton, EmptyState, Panel, StatusPill } from "./ui";
 
-export function TodayPanel({ activeLesson, dailyItems, isLessonComplete, markResult, startLesson, state }) {
+export function TodayPanel({ activeLesson, dailyItems, isLessonComplete, markResult, skipProblem, startLesson, state }) {
   if (!activeLesson) {
     return (
       <Panel>
@@ -38,7 +38,7 @@ export function TodayPanel({ activeLesson, dailyItems, isLessonComplete, markRes
 
       <div className="space-y-4">
         {dailyItems.length > 0 ? dailyItems.map((item) => (
-          <DailyProblemCard key={item.problem.id + "-" + item.kind} item={item} onMark={markResult} />
+          <DailyProblemCard key={item.problem.id + "-" + item.kind} item={item} onMark={markResult} onSkip={skipProblem} />
         )) : (
           <EmptyState title="Nothing scheduled today" body="You may have finished the library and cleared the review queue." />
         )}

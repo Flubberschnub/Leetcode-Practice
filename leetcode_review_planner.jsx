@@ -38,10 +38,11 @@ export default function LeetCodeReviewPlanner() {
         ...entry,
         problem,
         attemptThisLesson: problem && activeLesson ? getAttemptForLesson(problem, activeLesson.id) : null,
+        skipped: Boolean(entry.skipped),
       };
     })
     .filter((entry) => entry.problem);
-  const isLessonComplete = Boolean(activeLesson && dailyItems.length > 0 && dailyItems.every((item) => item.attemptThisLesson));
+  const isLessonComplete = Boolean(activeLesson && dailyItems.length > 0 && dailyItems.every((item) => item.attemptThisLesson || item.skipped));
   const reviewHorizonLesson = isLessonComplete ? activeLesson.id + 1 : planningLessonNumber;
 
   const stats = calculateStats(state.problems, reviewHorizonLesson);
@@ -128,6 +129,29 @@ export default function LeetCodeReviewPlanner() {
             mastery: next.mastery,
           };
         }),
+      };
+    });
+  }
+
+  function skipProblem(problemId) {
+    setState((previous) => {
+      const lessonId = previous.activeLessonId;
+      const lesson = lessonId ? previous.lessons?.[lessonId] : null;
+      if (!lesson) return previous;
+
+      return {
+        ...previous,
+        lessons: {
+          ...previous.lessons,
+          [lessonId]: {
+            ...lesson,
+            plan: lesson.plan.map((entry) => (
+              entry.problemId === problemId
+                ? { ...entry, skipped: true, skippedAt: new Date().toISOString() }
+                : entry
+            )),
+          },
+        },
       };
     });
   }
@@ -254,6 +278,7 @@ export default function LeetCodeReviewPlanner() {
             dailyItems={dailyItems}
             isLessonComplete={isLessonComplete}
             markResult={markResult}
+            skipProblem={skipProblem}
             startLesson={startLesson}
             state={state}
           />

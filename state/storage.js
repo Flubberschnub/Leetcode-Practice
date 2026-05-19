@@ -53,6 +53,8 @@ function normalizePlanEntries(entries = []) {
     ? entries.map((entry) => ({
         ...entry,
         problemId: normalizeProblemId(entry.problemId),
+        skipped: Boolean(entry.skipped),
+        skippedAt: entry.skippedAt || null,
       }))
     : [];
 }
