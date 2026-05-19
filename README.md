@@ -1,8 +1,16 @@
 # LeetCode Review Planner
 
-A local-first React app for planning LeetCode practice around algorithm patterns, spaced review, and the NeetCode 150 problem set.
+LeetCode Review Planner is a local web app for building a steady algorithm practice habit. It creates short practice lessons from the NeetCode 150 problem set, groups new problems by algorithm pattern, and brings old problems back for review before you forget them.
 
-The planner gives you a small lesson when you are ready to practice. A lesson contains new problems from the current pattern track plus review problems that are due based on previous solve results. After each problem, log whether you solved it solo, used a hint, or needed the solution.
+The core workflow is simple:
+
+1. Pick the algorithm pattern you want to focus on, such as Arrays & Hashing, Sliding Window, Trees, Graphs, or Dynamic Programming.
+2. Start a lesson.
+3. Solve each assigned problem on NeetCode.
+4. Log how the solve went: `solo`, `hint`, `solution`, or `skip`.
+5. Let the app schedule future reviews based on how well you remembered the problem.
+
+The app is local-first. Your progress is stored in your browser and can be exported as a JSON file when you want a backup or want to move to another machine.
 
 ## Screenshots
 
@@ -10,19 +18,63 @@ The planner gives you a small lesson when you are ready to practice. A lesson co
 
 ![Pattern map and planner controls](Screenshots/Screenshot%202026-05-19%20183459.png)
 
-## Features
+## What It Does
 
-- Lesson-based planning instead of calendar-based planning
-- Configurable mix of new problems and reviews
-- Spaced review scheduling by future lesson count
-- NeetCode 150 problem library with NeetCode links
-- Review backlog ordered by urgency and mastery
-- Searchable problem library
-- Clickable pattern map for routing the next lesson to a specific topic
-- JSON export/import for portable progress
-- Browser localStorage autosave
-- Configurable theme base and accent color
-- Matrix-style cyberpunk terminal UI with animated scanlines
+- Builds small practice lessons from the NeetCode 150 problem set
+- Teaches by algorithm pattern so you can internalize common problem-solving templates
+- Mixes new problems with review problems from your previous lessons
+- Schedules reviews by future lesson count, not by strict calendar dates
+- Tracks whether each solve was done solo, with a hint, or with the solution
+- Lets you skip a problem in the current lesson without changing that problem's history
+- Links each problem to its NeetCode page so your NeetCode account can track submissions
+- Provides a searchable library of all included problems
+- Lets you click the pattern map to choose the topic for your next lesson
+- Exports and imports progress as JSON
+- Uses a Matrix-inspired terminal interface with configurable theme colors
+
+## How Lessons Work
+
+A lesson is a short practice session. By default, each lesson contains:
+
+- `3` total problems
+- `2` new problems from the selected pattern
+- `1` review problem from your backlog, when one is due
+
+You can change those numbers in Settings.
+
+Reviews are scheduled by lesson number. For example, if a problem is due on lesson `7`, it will appear once you start lesson `7` or any later lesson. This keeps the app flexible if you practice irregularly.
+
+Your result changes the next review interval:
+
+- `solo`: you remembered it well, so the next review is farther away
+- `hint`: you were close, so the next review is sooner
+- `solution`: you needed to relearn it, so the next review comes back quickly
+- `skip`: the problem is removed from the current lesson only; mastery and review schedule are unchanged
+
+Completed and skipped problems are dimmed and locked in the active lesson so they are not logged twice.
+
+## Pattern Selection
+
+The pattern signal map shows every NeetCode 150 topic included in the app. Click any pattern to route the next lesson's new problems to that topic.
+
+Changing the selected pattern does not erase previous work. Review problems still come from the same global backlog, regardless of which new-problem pattern you choose.
+
+## Storage And Backups
+
+Progress is saved automatically in browser `localStorage` under:
+
+```text
+leetcode-review-planner-v2
+```
+
+This means progress survives refreshes, browser restarts, and dev server restarts in the same browser profile.
+
+Use Settings for portable backups:
+
+- `Export JSON` downloads your current progress
+- `Import JSON` restores progress from a file
+
+The app does not send your solve history to a server.
 
 ## Run Locally
 
@@ -79,45 +131,6 @@ http://localhost:8080
 
 The container serves the Vite production build with nginx. Progress is still stored in the browser that opens the app, so rebuilding or restarting the container does not erase browser-local progress.
 
-## How Lessons Work
-
-The app does not automatically generate a new plan every calendar day. Instead, click `Start lesson` when you are actually ready to practice.
-
-By default each lesson targets:
-
-- `3` total problems
-- `2` new problems
-- `1` review problem
-
-Reviews are scheduled by lesson count. For example, if a problem is due at lesson `7`, it appears when you start lesson `7` or later.
-
-The pattern signal map is clickable. Selecting a pattern changes the new-problem track for the next generated lesson while preserving all previous attempts, review stages, and due review backlog.
-
-Solve results affect the next review:
-
-- `solo`: longer interval and higher mastery gain
-- `hint`: shorter interval and smaller mastery gain
-- `solution`: quick review and mastery penalty
-
-Completed problems in the active lesson are visually dimmed and locked so you do not accidentally log them twice.
-
-## Storage
-
-Progress autosaves in browser `localStorage` under:
-
-```text
-leetcode-review-planner-v2
-```
-
-This survives refreshes, browser restarts, and dev server restarts on the same browser profile.
-
-For portability, use Settings:
-
-- `Export JSON` downloads your current progress
-- `Import JSON` restores progress from a file
-
-The import path merges saved progress against the current problem library so future library/link updates are less likely to break old saves.
-
 ## Project Structure
 
 ```text
@@ -148,6 +161,6 @@ src/
   styles.css                Tailwind imports and custom terminal UI styles
 ```
 
-## Notes
+## NeetCode Progress
 
-This app does not submit solutions or sync solve history to a server. NeetCode progress is handled by opening each problem on NeetCode and solving/submitting there.
+This app does not submit code or sync directly with NeetCode. It opens each assigned problem on NeetCode, where you can solve and submit normally. Your planner history stays local; your submission history stays with NeetCode.
