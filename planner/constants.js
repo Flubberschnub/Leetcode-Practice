@@ -27,6 +27,8 @@ export const DEFAULT_CONFIG = {
   newPerDay: 2,
   reviewPerDay: 1,
   currentPatternIndex: 0,
+  themeBase: "light",
+  accentColor: "blue",
 };
 
 export const RESULT_SETTINGS = {

@@ -5,3 +5,94 @@
 body {
   margin: 0;
 }
+
+.theme-root {
+  background: var(--color-page);
+  color: var(--color-text);
+}
+
+.theme-surface {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-panel);
+  color: var(--color-text);
+}
+
+.theme-subtle {
+  background: var(--color-subtle);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.theme-muted {
+  color: var(--color-muted);
+}
+
+.theme-strong {
+  color: var(--color-text);
+}
+
+.theme-link {
+  color: var(--color-text);
+}
+
+.theme-input {
+  background: var(--color-input);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.theme-input:focus {
+  border-color: var(--accent-strong);
+}
+
+.theme-tab {
+  color: var(--color-muted);
+}
+
+.theme-tab:hover {
+  background: var(--color-subtle);
+}
+
+.theme-tab-active {
+  background: var(--accent-strong);
+  color: white;
+}
+
+.theme-button-primary {
+  background: var(--accent-strong);
+  color: white;
+}
+
+.theme-button-primary:hover {
+  background: var(--accent-hover);
+}
+
+.theme-button-secondary {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.theme-button-secondary:hover {
+  filter: brightness(0.97);
+}
+
+.theme-button-outline {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.theme-button-outline:hover {
+  background: var(--color-subtle);
+}
+
+.theme-pill-accent {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.theme-pill-neutral {
+  background: var(--color-subtle);
+  color: var(--color-muted);
+}

@@ -2,8 +2,8 @@ import React from "react";
 
 export function StatusPill({ children, tone = "neutral" }) {
   const tones = {
-    neutral: "bg-slate-100 text-slate-700",
-    blue: "bg-blue-100 text-blue-700",
+    neutral: "theme-pill-neutral",
+    blue: "theme-pill-accent",
     green: "bg-green-100 text-green-700",
     amber: "bg-amber-100 text-amber-700",
     rose: "bg-rose-100 text-rose-700",
@@ -17,14 +17,14 @@ export function StatusPill({ children, tone = "neutral" }) {
 }
 
 export function Panel({ children, className = "" }) {
-  return <section className={"rounded-3xl border border-slate-200 bg-white p-5 shadow-sm " + className}>{children}</section>;
+  return <section className={"theme-surface rounded-3xl border p-5 " + className}>{children}</section>;
 }
 
 export function ActionButton({ children, onClick, variant = "primary" }) {
   const variants = {
-    primary: "bg-slate-900 text-white hover:bg-slate-800",
-    secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
-    outline: "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
+    primary: "theme-button-primary",
+    secondary: "theme-button-secondary",
+    outline: "theme-button-outline border",
   };
 
   return (
@@ -40,9 +40,9 @@ export function ActionButton({ children, onClick, variant = "primary" }) {
 
 export function EmptyState({ title, body }) {
   return (
-    <div className="rounded-3xl border border-dashed border-slate-300 p-8 text-center">
-      <p className="font-medium text-slate-900">{title}</p>
-      <p className="mt-2 text-sm text-slate-500">{body}</p>
+    <div className="theme-subtle rounded-3xl border border-dashed p-8 text-center">
+      <p className="theme-strong font-medium">{title}</p>
+      <p className="theme-muted mt-2 text-sm">{body}</p>
     </div>
   );
 }

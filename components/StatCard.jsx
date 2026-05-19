@@ -4,9 +4,9 @@ import { Panel } from "./ui";
 export function StatCard({ label, value, helper }) {
   return (
     <Panel className="min-h-[128px]">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">{value}</p>
-      {helper ? <p className="mt-2 text-sm text-slate-500">{helper}</p> : null}
+      <p className="theme-muted text-sm">{label}</p>
+      <p className="theme-strong mt-3 text-2xl font-semibold tracking-tight">{value}</p>
+      {helper ? <p className="theme-muted mt-2 text-sm">{helper}</p> : null}
     </Panel>
   );
 }

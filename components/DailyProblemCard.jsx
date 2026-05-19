@@ -12,7 +12,7 @@ export function DailyProblemCard({ item, onMark }) {
   const resultTone = attemptToday?.result === "independent" ? "green" : attemptToday?.result === "hint" ? "amber" : "rose";
 
   return (
-    <article className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+    <article className="theme-subtle rounded-3xl border p-5">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -26,16 +26,16 @@ export function DailyProblemCard({ item, onMark }) {
             href={problem.url}
             target="_blank"
             rel="noreferrer"
-            className="mt-3 block text-xl font-semibold text-slate-950 underline-offset-4 hover:underline"
+            className="theme-link mt-3 block text-xl font-semibold underline-offset-4 hover:underline"
           >
             {problem.title}
           </a>
 
-          <p className="mt-2 text-sm text-slate-600">
+          <p className="theme-muted mt-2 text-sm">
             {attemptToday ? "Today's result: " + RESULT_SETTINGS[attemptToday.result].label + ". Next review: " + (problem.dueDate || "not scheduled") + "." : reviewCopy}
           </p>
           {item.kind === "review" && problem.dueDate ? (
-            <p className="mt-1 text-sm text-slate-500">Due date: {problem.dueDate}</p>
+            <p className="theme-muted mt-1 text-sm">Due date: {problem.dueDate}</p>
           ) : null}
         </div>
 

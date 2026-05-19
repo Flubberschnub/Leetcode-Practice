@@ -11,6 +11,7 @@ import {
   getNextReviewUpdate,
   reviewPriority,
 } from "./planner/scheduler";
+import { getThemeStyle } from "./planner/theme";
 import { createInitialState, loadState, parseStateFile, resetSavedState, saveState, serializeStateFile } from "./state/storage";
 import { getToday } from "./utils/date";
 
@@ -41,6 +42,7 @@ export default function LeetCodeReviewPlanner() {
 
   const stats = calculateStats(state.problems, today);
   const currentPattern = PATTERN_ORDER[state.config.currentPatternIndex] || PATTERN_ORDER[0];
+  const themeStyle = useMemo(() => getThemeStyle(state.config), [state.config]);
 
   const reviewBacklog = [...state.problems]
     .filter((problem) => problem.status !== "unseen")
@@ -165,19 +167,19 @@ export default function LeetCodeReviewPlanner() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 text-slate-950 md:p-8">
+    <main className="theme-root min-h-screen p-4 md:p-8" style={themeStyle}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <header className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+        <header className="theme-surface rounded-[2rem] border p-6 md:p-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-4xl">
               <StatusPill tone="blue">LeetCode review planner</StatusPill>
               <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">
                 Three curated problems a day, with spaced reviews that adapt.
               </h1>
-              <p className="mt-4 max-w-3xl text-slate-600">
+              <p className="theme-muted mt-4 max-w-3xl">
                 Practice a small number of new problems from one NeetCode 150 pattern while revisiting older problems based on whether you solved them solo, needed a hint, or needed the solution.
               </p>
-              <a href={NEETCODE_150_URL} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-medium text-slate-700 underline-offset-4 hover:underline">
+              <a href={NEETCODE_150_URL} target="_blank" rel="noreferrer" className="theme-link mt-3 inline-block text-sm font-medium underline-offset-4 hover:underline">
                 Problem source: NeetCode 150
               </a>
             </div>
@@ -192,7 +194,7 @@ export default function LeetCodeReviewPlanner() {
           <StatCard label="Mastery 6+" value={String(stats.mastered)} helper="A rough signal of durable recall." />
         </section>
 
-        <nav className="flex flex-wrap gap-2 rounded-3xl border border-slate-200 bg-white p-2 shadow-sm">
+        <nav className="theme-surface flex flex-wrap gap-2 rounded-3xl border p-2">
           {[
             ["today", "Today's plan"],
             ["backlog", "Review backlog"],
@@ -205,7 +207,7 @@ export default function LeetCodeReviewPlanner() {
               onClick={() => setActiveTab(value)}
               className={
                 "rounded-2xl px-4 py-2 text-sm font-medium transition " +
-                (activeTab === value ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100")
+                (activeTab === value ? "theme-tab-active" : "theme-tab")
               }
             >
               {label}
