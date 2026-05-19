@@ -6,15 +6,83 @@ body {
   margin: 0;
 }
 
+:root {
+  --font-code: "JetBrains Mono", "Cascadia Code", "Fira Code", "IBM Plex Mono", "Roboto Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
 .theme-root {
   background: var(--color-page);
   color: var(--color-text);
 }
 
+.cyber-root {
+  background:
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--accent-strong) 22%, transparent), transparent 26rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-page) 88%, black), var(--color-page));
+  font-family: var(--font-code);
+  isolation: isolate;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.cyber-root::before {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 50%, rgba(0, 0, 0, 0.1) 50%),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent-strong) 10%, transparent) 1px, transparent 1px);
+  animation: scanline-drift 7s linear infinite;
+  background-size: 100% 5px, 48px 48px;
+  content: "";
+  inset: 0;
+  mix-blend-mode: screen;
+  opacity: 0.28;
+  pointer-events: none;
+  position: fixed;
+  z-index: 50;
+}
+
+.cyber-root::after {
+  animation: crt-roll 5s linear infinite;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--accent-strong) 18%, transparent),
+    transparent
+  );
+  content: "";
+  height: 18vh;
+  left: 0;
+  opacity: 0.16;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  top: -20vh;
+  z-index: 51;
+}
+
+@keyframes scanline-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+
+  to {
+    background-position: 0 40px, 48px 0;
+  }
+}
+
+@keyframes crt-roll {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(120vh);
+  }
+}
+
 .theme-surface {
   background: var(--color-surface);
   border-color: var(--color-border);
-  box-shadow: var(--shadow-panel);
+  box-shadow: var(--shadow-panel), inset 0 0 0 1px color-mix(in srgb, var(--accent-strong) 16%, transparent);
   color: var(--color-text);
 }
 
@@ -61,7 +129,7 @@ body {
 
 .theme-button-primary {
   background: var(--accent-strong);
-  color: white;
+  color: #001b0a;
 }
 
 .theme-button-primary:hover {
@@ -69,7 +137,8 @@ body {
 }
 
 .theme-button-secondary {
-  background: var(--accent-soft);
+  background: transparent;
+  border: 1px solid var(--accent-strong);
   color: var(--accent-text);
 }
 
@@ -95,4 +164,80 @@ body {
 .theme-pill-neutral {
   background: var(--color-subtle);
   color: var(--color-muted);
+}
+
+.terminal-panel {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 95%, transparent), var(--color-surface)),
+    repeating-linear-gradient(90deg, transparent, transparent 18px, color-mix(in srgb, var(--accent-strong) 8%, transparent) 19px);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-panel), 0 0 0 1px color-mix(in srgb, var(--accent-strong) 12%, transparent);
+  color: var(--color-text);
+}
+
+.terminal-panel::selection,
+.cyber-root ::selection {
+  background: var(--accent-strong);
+  color: #001b0a;
+}
+
+.terminal-card {
+  background: color-mix(in srgb, var(--color-subtle) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-strong) 38%, var(--color-border));
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--accent-strong) 8%, transparent);
+}
+
+.terminal-title {
+  color: var(--color-text);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent-strong) 35%, transparent);
+}
+
+.terminal-prompt::before {
+  color: var(--accent-strong);
+  content: "> ";
+  font-weight: 900;
+}
+
+.terminal-label {
+  color: var(--accent-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.terminal-code {
+  background: #000;
+  border: 1px solid color-mix(in srgb, var(--accent-strong) 34%, var(--color-border));
+  color: var(--accent-text);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent-strong) 42%, transparent);
+}
+
+.terminal-divider {
+  background: linear-gradient(90deg, var(--accent-strong), transparent);
+  height: 1px;
+}
+
+.matrix-glyphs {
+  color: var(--accent-text);
+  opacity: 0.34;
+  overflow-wrap: anywhere;
+  user-select: none;
+}
+
+.mono,
+code,
+kbd,
+pre {
+  font-family: var(--font-code);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cyber-root::before,
+  .cyber-root::after {
+    animation: none;
+  }
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { BacklogPanel, LibraryPanel, SettingsPanel, TodayPanel } from "./components/PlannerPanels";
+import { PatternSignalMap } from "./components/PatternSignalMap";
 import { StatCard } from "./components/StatCard";
 import { ActionButton, StatusPill } from "./components/ui";
 import { NEETCODE_150_URL, PATTERN_ORDER } from "./planner/constants";
@@ -167,24 +168,30 @@ export default function LeetCodeReviewPlanner() {
   }
 
   return (
-    <main className="theme-root min-h-screen p-4 md:p-8" style={themeStyle}>
+    <main className="theme-root cyber-root min-h-screen p-4 md:p-8" style={themeStyle}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <header className="theme-surface rounded-[2rem] border p-6 md:p-8">
+        <header className="terminal-panel p-6 md:p-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-4xl">
-              <StatusPill tone="blue">LeetCode review planner</StatusPill>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">
-                Three curated problems a day, with spaced reviews that adapt.
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusPill tone="blue">LC_REVIEW_OS</StatusPill>
+                <span className="terminal-code px-3 py-1 text-xs">session={today}</span>
+              </div>
+              <h1 className="terminal-title mt-4 text-4xl md:text-6xl">
+                Wake up, practice patterns.
               </h1>
-              <p className="theme-muted mt-4 max-w-3xl">
-                Practice a small number of new problems from one NeetCode 150 pattern while revisiting older problems based on whether you solved them solo, needed a hint, or needed the solution.
+              <p className="theme-muted mt-4 max-w-3xl text-sm leading-7">
+                <span className="terminal-prompt">boot lesson planner</span><br />
+                ingest NeetCode 150, schedule recall probes, write result states, repeat until pattern recognition compiles.
               </p>
               <a href={NEETCODE_150_URL} target="_blank" rel="noreferrer" className="theme-link mt-3 inline-block text-sm font-medium underline-offset-4 hover:underline">
-                Problem source: NeetCode 150
+                source://neetcode150
               </a>
             </div>
             <ActionButton onClick={resetPlanner} variant="outline">Reset progress</ActionButton>
           </div>
+          <div className="terminal-divider mt-6" />
+          <p className="matrix-glyphs mt-4 text-xs">00101100 11001010 01010111 10001100 01110010 00011101 11010001 01100110 10101010</p>
         </header>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -194,7 +201,9 @@ export default function LeetCodeReviewPlanner() {
           <StatCard label="Mastery 6+" value={String(stats.mastered)} helper="A rough signal of durable recall." />
         </section>
 
-        <nav className="theme-surface flex flex-wrap gap-2 rounded-3xl border p-2">
+        <PatternSignalMap currentPattern={currentPattern} />
+
+        <nav className="terminal-panel flex flex-wrap gap-2 p-2">
           {[
             ["today", "Today's plan"],
             ["backlog", "Review backlog"],
@@ -206,7 +215,7 @@ export default function LeetCodeReviewPlanner() {
               type="button"
               onClick={() => setActiveTab(value)}
               className={
-                "rounded-2xl px-4 py-2 text-sm font-medium transition " +
+                "px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition " +
                 (activeTab === value ? "theme-tab-active" : "theme-tab")
               }
             >

@@ -1,5 +1,5 @@
 import React from "react";
-import { PATTERN_ORDER, RESULT_SETTINGS } from "../planner/constants";
+import { PATTERN_CODES, PATTERN_ORDER, RESULT_SETTINGS } from "../planner/constants";
 import { difficultyTone, getLastAttempt } from "../planner/scheduler";
 import { ACCENT_COLORS } from "../planner/theme";
 import { DailyProblemCard } from "./DailyProblemCard";
@@ -11,7 +11,7 @@ export function TodayPanel({ dailyItems, lockTodayPlan, markResult, state, today
     <Panel>
       <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold">Today's plan - {today}</h2>
+          <h2 className="terminal-title text-2xl">./daily_lesson --date {today}</h2>
           <p className="theme-muted mt-1">
             Target mix: {state.config.newPerDay} new problem{state.config.newPerDay === 1 ? "" : "s"} and {state.config.reviewPerDay} review{state.config.reviewPerDay === 1 ? "" : "s"}.
           </p>
@@ -34,7 +34,7 @@ export function BacklogPanel({ reviewBacklog, today }) {
   return (
     <Panel>
       <div className="mb-5">
-        <h2 className="text-2xl font-semibold">Review backlog</h2>
+        <h2 className="terminal-title text-2xl">review_backlog.log</h2>
         <p className="theme-muted mt-1">Urgent, overdue, and low-mastery problems rise to the top.</p>
       </div>
 
@@ -45,18 +45,25 @@ export function BacklogPanel({ reviewBacklog, today }) {
           const isDue = problem.dueDate && problem.dueDate <= today;
 
           return (
-            <article key={problem.id} className="theme-subtle flex flex-col gap-3 rounded-3xl border p-4 md:flex-row md:items-center md:justify-between">
+            <article key={problem.id} className="terminal-card grid gap-0 md:grid-cols-[90px_1fr_180px]">
+              <div className="border-b p-4 md:border-b-0 md:border-r" style={{ borderColor: "var(--color-border)" }}>
+                <p className="terminal-label">pid</p>
+                <p className="terminal-title mt-2">{PATTERN_CODES[problem.pattern] || "ALG"}</p>
+              </div>
               <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <a href={problem.url} target="_blank" rel="noreferrer" className="theme-link font-semibold underline-offset-4 hover:underline">{problem.title}</a>
+                <div className="flex flex-wrap items-center gap-2 p-4 pb-0">
                   <StatusPill>{problem.pattern}</StatusPill>
                   <StatusPill tone={isDue ? "amber" : "neutral"}>{isDue ? "Due" : "Scheduled"}</StatusPill>
                 </div>
-                <p className="theme-muted mt-2 text-sm">
+                <a href={problem.url} target="_blank" rel="noreferrer" className="terminal-prompt theme-link block px-4 pt-2 font-bold underline-offset-4 hover:underline">{problem.title}</a>
+                <p className="theme-muted px-4 pb-4 pt-2 text-sm">
                   Due: {problem.dueDate || "not scheduled"} - Attempts: {problem.attempts.length} - Mastery: {problem.mastery}/10
                 </p>
               </div>
-              <p className="theme-muted text-sm">Last result: {lastLabel}</p>
+              <div className="border-t p-4 md:border-l md:border-t-0" style={{ borderColor: "var(--color-border)" }}>
+                <p className="terminal-label">last_result</p>
+                <p className="theme-muted mt-2 text-sm">{lastLabel}</p>
+              </div>
             </article>
           );
         }) : (
@@ -76,12 +83,12 @@ export function LibraryPanel({ libraryProblems, patternFilter, search, setPatter
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search problems..."
-          className="theme-input rounded-2xl border px-4 py-3 outline-none"
+          className="theme-input border px-4 py-3 font-bold outline-none"
         />
         <select
           value={patternFilter}
           onChange={(event) => setPatternFilter(event.target.value)}
-          className="theme-input rounded-2xl border px-4 py-3 outline-none"
+          className="theme-input border px-4 py-3 font-bold outline-none"
         >
           <option value="all">All patterns</option>
           {PATTERN_ORDER.map((pattern) => (
@@ -92,16 +99,23 @@ export function LibraryPanel({ libraryProblems, patternFilter, search, setPatter
 
       <div className="space-y-3">
         {libraryProblems.map((problem) => (
-          <article key={problem.id} className="theme-subtle flex flex-col gap-3 rounded-3xl border p-4 md:flex-row md:items-center md:justify-between">
-            <div>
+          <article key={problem.id} className="terminal-card grid gap-0 md:grid-cols-[90px_1fr_120px]">
+            <div className="border-b p-4 md:border-b-0 md:border-r" style={{ borderColor: "var(--color-border)" }}>
+              <p className="terminal-label">module</p>
+              <p className="terminal-title mt-2">{PATTERN_CODES[problem.pattern] || "ALG"}</p>
+            </div>
+            <div className="p-4">
               <div className="flex flex-wrap items-center gap-2">
-                <a href={problem.url} target="_blank" rel="noreferrer" className="theme-link font-semibold underline-offset-4 hover:underline">{problem.title}</a>
                 <StatusPill>{problem.pattern}</StatusPill>
                 <StatusPill tone={difficultyTone(problem.difficulty)}>{problem.difficulty}</StatusPill>
               </div>
+              <a href={problem.url} target="_blank" rel="noreferrer" className="terminal-prompt theme-link mt-2 block font-bold underline-offset-4 hover:underline">{problem.title}</a>
               <p className="theme-muted mt-2 text-sm">Status: {problem.status} - Next review: {problem.dueDate || "not started"}</p>
             </div>
-            <p className="theme-muted text-sm">Attempts: {problem.attempts.length}</p>
+            <div className="border-t p-4 md:border-l md:border-t-0" style={{ borderColor: "var(--color-border)" }}>
+              <p className="terminal-label">tries</p>
+              <p className="terminal-title mt-2">{problem.attempts.length}</p>
+            </div>
           </article>
         ))}
       </div>
@@ -113,7 +127,7 @@ export function SettingsPanel({ advancePattern, currentPattern, exportProgressFi
   return (
     <Panel>
       <div className="mb-5">
-        <h2 className="text-2xl font-semibold">Planner settings</h2>
+        <h2 className="terminal-title text-2xl">config.sys</h2>
         <p className="theme-muted mt-1">Tune the daily mix while keeping the planner simple.</p>
       </div>
 
@@ -123,10 +137,10 @@ export function SettingsPanel({ advancePattern, currentPattern, exportProgressFi
         <NumberSetting label="Reviews per day" value={state.config.reviewPerDay} onChange={(value) => updateConfig("reviewPerDay", value)} />
       </div>
 
-      <div className="theme-subtle mt-5 rounded-3xl border p-5">
+      <div className="terminal-card mt-5 p-5">
         <div className="grid gap-5 lg:grid-cols-[220px_1fr]">
           <div>
-            <p className="font-semibold">Theme</p>
+            <p className="terminal-label">visual kernel</p>
             <p className="theme-muted mt-1 text-sm">Choose a light or dark base and an accent color.</p>
           </div>
 
@@ -141,7 +155,7 @@ export function SettingsPanel({ advancePattern, currentPattern, exportProgressFi
                   type="button"
                   onClick={() => updateConfig("themeBase", value)}
                   className={
-                    "rounded-2xl px-4 py-2 text-sm font-medium transition " +
+                    "px-4 py-2 text-sm font-bold uppercase tracking-[0.14em] transition " +
                     (state.config.themeBase === value ? "theme-tab-active" : "theme-button-outline border")
                   }
                 >
@@ -157,7 +171,7 @@ export function SettingsPanel({ advancePattern, currentPattern, exportProgressFi
                   type="button"
                   onClick={() => updateConfig("accentColor", accent.value)}
                   className={
-                    "flex items-center gap-2 rounded-2xl border px-3 py-2 text-sm font-medium transition " +
+                    "flex items-center gap-2 border px-3 py-2 text-sm font-bold uppercase tracking-[0.14em] transition " +
                     (state.config.accentColor === accent.value ? "theme-tab-active border-transparent" : "theme-button-outline")
                   }
                 >
@@ -170,26 +184,26 @@ export function SettingsPanel({ advancePattern, currentPattern, exportProgressFi
         </div>
       </div>
 
-      <div className="theme-subtle mt-5 rounded-3xl border p-5">
+      <div className="terminal-card mt-5 p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-semibold">Current lesson track</p>
+            <p className="terminal-label">current_thread</p>
             <p className="theme-muted mt-1 text-sm">{currentPattern}</p>
           </div>
           <ActionButton onClick={advancePattern}>Advance to next pattern</ActionButton>
         </div>
       </div>
 
-      <div className="theme-subtle mt-5 rounded-3xl border p-5">
+      <div className="terminal-card mt-5 p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-semibold">Progress file</p>
+            <p className="terminal-label">state_dump</p>
             <p className="theme-muted mt-1 text-sm">Export a JSON backup or import one from another browser or machine.</p>
             {fileStatus ? <p className="theme-muted mt-2 text-sm">{fileStatus}</p> : null}
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <ActionButton onClick={exportProgressFile} variant="secondary">Export JSON</ActionButton>
-            <label className="theme-button-outline cursor-pointer rounded-2xl border px-4 py-2 text-center text-sm font-medium transition">
+            <label className="theme-button-outline cursor-pointer border px-4 py-2 text-center text-xs font-bold uppercase tracking-[0.18em] transition">
               Import JSON
               <input type="file" accept="application/json,.json" onChange={importProgressFile} className="hidden" />
             </label>

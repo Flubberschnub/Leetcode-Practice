@@ -10,18 +10,19 @@ const BASE_THEME_COLORS = {
     shadow: "0 1px 2px rgb(15 23 42 / 0.05)",
   },
   dark: {
-    page: "#0b1120",
-    surface: "#111827",
-    subtle: "#1f2937",
-    input: "#0f172a",
-    border: "#334155",
-    text: "#f8fafc",
-    muted: "#94a3b8",
-    shadow: "0 1px 2px rgb(0 0 0 / 0.2)",
+    page: "#020403",
+    surface: "#041108",
+    subtle: "#071a0d",
+    input: "#020806",
+    border: "#14532d",
+    text: "#d1fae5",
+    muted: "#6ee7b7",
+    shadow: "0 0 24px rgb(34 197 94 / 0.12)",
   },
 };
 
 export const ACCENT_COLORS = [
+  { value: "matrix", label: "Matrix", swatch: "#22c55e" },
   { value: "blue", label: "Blue", swatch: "#2563eb" },
   { value: "emerald", label: "Emerald", swatch: "#059669" },
   { value: "violet", label: "Violet", swatch: "#7c3aed" },
@@ -31,6 +32,7 @@ export const ACCENT_COLORS = [
 ];
 
 const ACCENT_THEME_COLORS = {
+  matrix: { soft: "#052e16", text: "#86efac", strong: "#22c55e", hover: "#16a34a" },
   blue: { soft: "#dbeafe", text: "#1d4ed8", strong: "#2563eb", hover: "#1d4ed8" },
   emerald: { soft: "#d1fae5", text: "#047857", strong: "#059669", hover: "#047857" },
   violet: { soft: "#ede9fe", text: "#6d28d9", strong: "#7c3aed", hover: "#6d28d9" },
@@ -41,7 +43,7 @@ const ACCENT_THEME_COLORS = {
 
 export function getThemeStyle(config = {}) {
   const base = BASE_THEME_COLORS[config.themeBase] || BASE_THEME_COLORS.light;
-  const accent = ACCENT_THEME_COLORS[config.accentColor] || ACCENT_THEME_COLORS.blue;
+  const accent = ACCENT_THEME_COLORS[config.accentColor] || ACCENT_THEME_COLORS.matrix;
 
   return {
     "--color-page": base.page,

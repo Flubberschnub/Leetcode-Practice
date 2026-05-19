@@ -22,13 +22,34 @@ export const PATTERN_ORDER = [
   "Bit Manipulation",
 ];
 
+export const PATTERN_CODES = {
+  "Arrays & Hashing": "ARR",
+  "Two Pointers": "PTR",
+  "Sliding Window": "WIN",
+  Stack: "STK",
+  "Binary Search": "BIN",
+  "Linked List": "LST",
+  Trees: "TRE",
+  "Heap / Priority Queue": "HEP",
+  Backtracking: "BKT",
+  Tries: "TRI",
+  Graphs: "GRF",
+  "Advanced Graphs": "AGF",
+  "1-D Dynamic Programming": "DP1",
+  "2-D Dynamic Programming": "DP2",
+  Greedy: "GRD",
+  Intervals: "INT",
+  "Math & Geometry": "GEO",
+  "Bit Manipulation": "BIT",
+};
+
 export const DEFAULT_CONFIG = {
   dailyCount: 3,
   newPerDay: 2,
   reviewPerDay: 1,
   currentPatternIndex: 0,
-  themeBase: "light",
-  accentColor: "blue",
+  themeBase: "dark",
+  accentColor: "matrix",
 };
 
 export const RESULT_SETTINGS = {
