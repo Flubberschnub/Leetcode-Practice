@@ -64,6 +64,7 @@ function normalizeLessons(lessons = {}) {
       {
         ...lesson,
         id: Number(lesson.id || lessonId),
+        pattern: lesson.pattern || null,
         plan: normalizePlanEntries(lesson.plan),
       },
     ])

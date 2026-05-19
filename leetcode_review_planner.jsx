@@ -61,6 +61,7 @@ export default function LeetCodeReviewPlanner() {
   function startLesson() {
     setState((previous) => {
       const nextLessonId = (previous.lessonCounter || 0) + 1;
+      const lessonPattern = PATTERN_ORDER[previous.config.currentPatternIndex] || PATTERN_ORDER[0];
       const plan = generatePlan(previous, nextLessonId);
 
       return {
@@ -71,12 +72,26 @@ export default function LeetCodeReviewPlanner() {
           ...previous.lessons,
           [nextLessonId]: {
             id: nextLessonId,
+            pattern: lessonPattern,
             startedAt: new Date().toISOString(),
             plan,
           },
         },
       };
     });
+  }
+
+  function selectPattern(pattern) {
+    const patternIndex = PATTERN_ORDER.indexOf(pattern);
+    if (patternIndex === -1) return;
+
+    setState((previous) => ({
+      ...previous,
+      config: {
+        ...previous.config,
+        currentPatternIndex: patternIndex,
+      },
+    }));
   }
 
   function markResult(problemId, result) {
@@ -206,7 +221,11 @@ export default function LeetCodeReviewPlanner() {
           <StatCard label="Mastery 6+" value={String(stats.mastered)} helper="A rough signal of durable recall." />
         </section>
 
-        <PatternSignalMap currentPattern={currentPattern} />
+        <PatternSignalMap
+          activeLessonPattern={activeLesson?.pattern}
+          currentPattern={currentPattern}
+          onSelectPattern={selectPattern}
+        />
 
         <nav className="terminal-panel flex flex-wrap gap-2 p-2">
           {[

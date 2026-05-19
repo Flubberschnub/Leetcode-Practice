@@ -12,6 +12,7 @@ The planner gives you a small lesson when you are ready to practice. A lesson co
 - NeetCode 150 problem library with NeetCode links
 - Review backlog ordered by urgency and mastery
 - Searchable problem library
+- Clickable pattern map for routing the next lesson to a specific topic
 - JSON export/import for portable progress
 - Browser localStorage autosave
 - Configurable theme base and accent color
@@ -83,6 +84,8 @@ By default each lesson targets:
 - `1` review problem
 
 Reviews are scheduled by lesson count. For example, if a problem is due at lesson `7`, it appears when you start lesson `7` or later.
+
+The pattern signal map is clickable. Selecting a pattern changes the new-problem track for the next generated lesson while preserving all previous attempts, review stages, and due review backlog.
 
 Solve results affect the next review:
 
